@@ -1,20 +1,39 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Response, NextFunction } from 'express';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import {AuthenticatedRequest} from '../interface/auth.interface'
+import { Request } from 'express';
+import { jwtConstants } from './secret';
 
 @Injectable()
-export class AuthMiddleware implements NestMiddleware {
-  constructor(private readonly jwtService: JwtService) {}
+export class AuthGuard implements CanActivate {
+  constructor(private jwtService: JwtService) {}
 
-  use(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    const token = req.headers.authorization?.split(' ')[1];
-    try {
-      const payload = this.jwtService.verify(token);
-      req.user = payload;
-      next();
-    } catch (err) {
-      res.status(401).json({ message: 'Invalid token' });
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const token = this.extractTokenFromHeader(request);
+    if (!token) {
+      throw new UnauthorizedException();
     }
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        token,
+        {
+          secret: jwtConstants.secret
+        }
+      );
+      request['user'] = payload;
+    } catch {
+      throw new UnauthorizedException();
+    }
+    return true;
+  }
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
   }
 }

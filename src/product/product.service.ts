@@ -18,7 +18,6 @@ export class ProductService {
 
   async create(productDto: CreateProductDto, user: User): Promise<Product> {
     const { productName, categoryId, categoryName, price, status } = productDto;
-    log(user)
     const isExist = await this.productRepository.findOne({ where: { productName } });
     if (isExist) {
         throw new ConflictException('product already taken. Please choose a different product name.');
@@ -31,8 +30,7 @@ export class ProductService {
     product.price = price;
     product.status = status;
     product.user = user;
-
-    return this.productRepository.save(product);
+    return await this.productRepository.save(product);
   }
 
 //   async update(id: number, product: Product): Promise<Product> {

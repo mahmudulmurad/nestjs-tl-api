@@ -4,12 +4,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { User } from '../entities';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
+import { jwtConstants } from '../auth/secret';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
-      secret: 'thatsWhatSheSaid', 
+      secret:jwtConstants.secret, 
       signOptions: { expiresIn: '1h' }
     }),
   ],
