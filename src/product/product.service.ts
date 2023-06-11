@@ -1,23 +1,22 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Product, User } from '../entities';
+import { Product } from '../entities';
 import { CreateProductDto } from '../dto/create-product.dot';
-
+import { v4 as uuidv4 } from 'uuid';
+import { UpdateProductDto } from 'src/dto/update-product.dto';
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
   ) {}
 
   async findAll(): Promise<Product[]> {
     return this.productRepository.find();
   }
 
-  async create(productDto: CreateProductDto, userId: string): Promise<Product> {
+  async create(productDto: CreateProductDto): Promise<Product> {
     const { productName } = productDto;
     const isExist = await this.productRepository.findOne({
       where: { productName },
@@ -27,32 +26,61 @@ export class ProductService {
         'product already taken. Please choose a different product name.',
       );
     }
+    const product = this.productRepository.create(productDto);
+    product.id = uuidv4(); 
+    return await this.productRepository.save(product);
+  }
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
+  async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
+    const { productName } = updateProductDto;
+    const product = await this.productRepository
+          .createQueryBuilder()
+          .where('id = :id', { id })
+          .orWhere('product_name = :productName', { productName })
+          .getOne();
+
+    if (product) {
+      if (product.productName === productName) {
+        throw new ConflictException(
+          'product already taken. Please choose a different product name.',
+        );
+      } else {
+        Object.assign(product, updateProductDto);
+        return this.productRepository.save(product);
+      }
+    }
+  }
+
+  async remove(id: string): Promise<string> {
+    const isExist = await this.productRepository.findOne({
+      where: { id },
     });
-
-    const product = new Product();
-    product.productName = productDto.productName;
-    product.categoryId = productDto.categoryId;
-    product.categoryName = productDto.categoryName;
-    product.price = productDto.price;
-    product.status = productDto.status;
-    product.user = user;
-
-    return this.productRepository.save(product);
-  }
-
-  //   async update(id: number, product: Product): Promise<Product> {
-  //     await this.productRepository.update(id, product);
-  //     return this.productRepository.findOne(id);
-  //   }
-
-  async remove(id: number): Promise<void> {
+    if (!isExist) {
+      throw new ConflictException(
+        'product does not exist.',
+      );
+    }
     await this.productRepository.delete(id);
+    return 'Product has been deleted'
   }
 
-  async deleteProducts(ids: number[]): Promise<void> {
-    await this.productRepository.delete(ids);
+  async deleteProducts(ids: string[]): Promise<string> {
+    const result = await this.productRepository
+    .createQueryBuilder()
+    .delete()
+    .from(Product)
+    .where("id IN (:...ids)", { ids })
+    .execute();
+
+    if (result.affected > 0) {
+      if (result.affected === ids.length) {
+        return 'Selected products have been deleted';
+      } else {
+        return `Some products have been deleted, but not all. (${result.affected} out of ${ids.length} deleted)`;
+      }
+    } else {
+      throw new NotFoundException('No products found with the provided IDs');
+    }
+  
   }
 }

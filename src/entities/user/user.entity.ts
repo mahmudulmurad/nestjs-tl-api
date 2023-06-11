@@ -4,10 +4,8 @@ import {
   PrimaryGeneratedColumn,
   VersionColumn,
   Unique,
-  OneToMany,
-  JoinColumn,
+  PrimaryColumn,
 } from 'typeorm';
-import { Product } from '../product/product.entity';
 
 @Unique(['username'])
 @Entity()
@@ -16,7 +14,7 @@ export class User {
     name: 'id',
     nullable: false,
   })
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id: string;
 
   @Column({
@@ -49,7 +47,4 @@ export class User {
     nullable: true,
   })
   updatedAt: Date | null;
-
-  @OneToMany(() => Product, (product) => product.user)
-  products: Product[];
 }

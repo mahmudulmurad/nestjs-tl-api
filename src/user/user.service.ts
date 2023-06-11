@@ -6,7 +6,7 @@ import { LoginDto } from '../dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { log } from 'console';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -29,10 +29,8 @@ export class UserService {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = new User();
-    newUser.username = username;
-    newUser.password = hashedPassword;
+    const newUser = this.userRepository.create({username, password: hashedPassword});
+    newUser.id = uuidv4(); 
     return await this.userRepository.save(newUser);
   }
 

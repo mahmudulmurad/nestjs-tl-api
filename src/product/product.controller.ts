@@ -7,44 +7,45 @@ import {
   Body,
   Param,
   UseGuards,
-  Req,
+  Patch,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from '../entities';
 import { CreateProductDto } from '../dto/create-product.dot';
 import { AuthGuard } from '../auth';
+import { UpdateProductDto } from 'src/dto/update-product.dto';
 
+@UseGuards(AuthGuard)
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+ 
   @Get('all-product')
   async getAllProducts(): Promise<Product[]> {
     return this.productService.findAll();
   }
 
-  @UseGuards(AuthGuard)
   @Post('create-product')
   async createProduct(
-    @Body() product: CreateProductDto,
-    @Req() req,
+    @Body() product: CreateProductDto
   ): Promise<Product> {
-    const userId = req.user.id;
-    return this.productService.create(product, userId);
+    return this.productService.create(product);
   }
 
-  //   @Patch('update/:id')
-  //   async updateProduct(@Param('id') id: number, @Body() product: Partial<Product>): Promise<Product> {
-  //     return this.productService.update(id, product);
-  //   }
+    @Patch('update/:id')
+    async updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto): Promise<Product> {
+      return this.productService.updateProduct(id, updateProductDto);
+    }
 
   @Delete('delete/:id')
-  async deleteProduct(@Param('id') id: number): Promise<void> {
-    await this.productService.remove(id);
+  async deleteProduct(@Param('id') id: string): Promise<string> {
+    return await this.productService.remove(id);
   }
 
   @Delete('batch-delete')
-  async batchDeleteProducts(@Body() ids: number[]): Promise<void> {
-    await this.productService.deleteProducts(ids);
+  async batchDeleteProducts(@Body() data: {ids: string[]}): Promise<string> {
+    const arrayOfId =  data?.ids
+    return await this.productService.deleteProducts(arrayOfId);
   }
 }
