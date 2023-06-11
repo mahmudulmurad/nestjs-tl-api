@@ -1,5 +1,14 @@
 // product.controller.ts
-import { Controller, Get, Post, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product, User } from '../entities';
 import { CreateProductDto } from '../dto/create-product.dot';
@@ -17,14 +26,19 @@ export class ProductController {
 
   @UseGuards(AuthGuard)
   @Post('create-product')
-  async createProduct(@Body() product: CreateProductDto, @GetUser() user: User): Promise<Product> {
-    return this.productService.create(product,user);
+  async createProduct(
+    @Body() product: CreateProductDto,
+    @Req() req,
+  ): Promise<Product> {
+    const user = req.user;
+    product.user = user;
+    return this.productService.create(product);
   }
 
-//   @Patch('update/:id')
-//   async updateProduct(@Param('id') id: number, @Body() product: Partial<Product>): Promise<Product> {
-//     return this.productService.update(id, product);
-//   }
+  //   @Patch('update/:id')
+  //   async updateProduct(@Param('id') id: number, @Body() product: Partial<Product>): Promise<Product> {
+  //     return this.productService.update(id, product);
+  //   }
 
   @Delete('delete/:id')
   async deleteProduct(@Param('id') id: number): Promise<void> {

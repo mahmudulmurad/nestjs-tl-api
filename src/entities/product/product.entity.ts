@@ -1,13 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  Unique,
+} from 'typeorm';
 import { User } from '../user/user.entity';
 
-
-@Unique(['productId'])
 @Unique(['productName'])
 @Entity()
 export class Product {
+  @Column({
+    name: 'id',
+    nullable: false,
+  })
   @PrimaryGeneratedColumn('uuid')
-  productId: number;
+  id: string;
 
   @Column({
     name: 'product_name',
@@ -27,22 +36,23 @@ export class Product {
   })
   categoryName: string;
 
-  @Column({ type: 'decimal',
+  @Column({
+    type: 'decimal',
     precision: 10,
     scale: 2,
     nullable: false,
-    name: 'price'
+    name: 'price',
   })
   price: number;
 
   @Column({
     name: 'status',
     nullable: false,
-    default: true 
- })
- status: boolean;
+    default: true,
+  })
+  status: boolean;
 
- @Column({
+  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
     name: 'created_at',
@@ -58,8 +68,7 @@ export class Product {
   })
   updatedAt: Date | null;
 
- 
-  @ManyToOne(() => User, user => user.products)
+  @ManyToOne(() => User, (user) => user.products)
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

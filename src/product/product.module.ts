@@ -1,4 +1,4 @@
-import {Module} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
@@ -10,8 +10,8 @@ import { jwtConstants } from '../auth/secret';
   imports: [
     TypeOrmModule.forFeature([Product]),
     JwtModule.register({
-      secret:jwtConstants.secret, 
-      signOptions: { expiresIn: '1h' }
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '1h' },
     }),
   ],
   controllers: [ProductController],

@@ -1,11 +1,11 @@
-import { 
-    Entity,
-    Column,
-    PrimaryGeneratedColumn, 
-    VersionColumn, 
-    Unique, 
-    OneToMany,
-    JoinColumn
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  VersionColumn,
+  Unique,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { Product } from '../product/product.entity';
 
@@ -15,9 +15,9 @@ export class User {
   @Column({
     name: 'id',
     nullable: false,
-    })
+  })
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({
     name: 'username',
@@ -50,7 +50,6 @@ export class User {
   })
   updatedAt: Date | null;
 
-  @JoinColumn({ name: 'user_id' })
-  @OneToMany(() => Product, product => product.user)
+  @OneToMany(() => Product, (product) => product.user)
   products: Product[];
 }

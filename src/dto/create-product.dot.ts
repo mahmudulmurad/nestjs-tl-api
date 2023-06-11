@@ -1,5 +1,6 @@
 // create-product.dto.ts
 import { IsNotEmpty, IsNumber, IsString, IsBoolean } from 'class-validator';
+import { User } from 'src/entities';
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -20,5 +21,8 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @IsBoolean()
-  status: boolean;
+  status?: boolean;
+
+  @IsNotEmpty()
+  user: User;
 }

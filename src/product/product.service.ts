@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product, User } from '../entities';
 import { CreateProductDto } from '../dto/create-product.dot';
-import { log } from 'console';
 
 @Injectable()
 export class ProductService {
@@ -16,27 +15,35 @@ export class ProductService {
     return this.productRepository.find();
   }
 
-  async create(productDto: CreateProductDto, user: User): Promise<Product> {
-    const { productName, categoryId, categoryName, price, status } = productDto;
-    const isExist = await this.productRepository.findOne({ where: { productName } });
+  async create(productDto: CreateProductDto): Promise<Product> {
+    const { productName } = productDto;
+    const isExist = await this.productRepository.findOne({
+      where: { productName },
+    });
     if (isExist) {
-        throw new ConflictException('product already taken. Please choose a different product name.');
+      throw new ConflictException(
+        'product already taken. Please choose a different product name.',
+      );
     }
 
+    // const product = this.productRepository.create(productDto);
+    // return this.productRepository.save(product);
+
     const product = new Product();
-    product.productName = productName;
-    product.categoryId = categoryId;
-    product.categoryName = categoryName;
-    product.price = price;
-    product.status = status;
-    product.user = user;
-    return await this.productRepository.save(product);
+    product.productName = productDto.productName;
+    product.categoryId = productDto.categoryId;
+    product.categoryName = productDto.categoryName;
+    product.price = productDto.price;
+    product.status = productDto.status;
+    product.user = productDto.user;
+
+    return this.productRepository.save(product);
   }
 
-//   async update(id: number, product: Product): Promise<Product> {
-//     await this.productRepository.update(id, product);
-//     return this.productRepository.findOne(id);
-//   }
+  //   async update(id: number, product: Product): Promise<Product> {
+  //     await this.productRepository.update(id, product);
+  //     return this.productRepository.findOne(id);
+  //   }
 
   async remove(id: number): Promise<void> {
     await this.productRepository.delete(id);
