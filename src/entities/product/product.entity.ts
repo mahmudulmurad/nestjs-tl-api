@@ -3,8 +3,8 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
-  JoinColumn,
   Unique,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../user/user.entity';
 
@@ -69,6 +69,6 @@ export class Product {
   updatedAt: Date | null;
 
   @ManyToOne(() => User, (user) => user.products)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'user' })
   user: User;
 }

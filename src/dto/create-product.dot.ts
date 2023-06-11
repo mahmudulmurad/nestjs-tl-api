@@ -22,7 +22,4 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsBoolean()
   status?: boolean;
-
-  @IsNotEmpty()
-  user: User;
 }

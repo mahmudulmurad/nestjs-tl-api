@@ -9,13 +9,15 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async findAll(): Promise<Product[]> {
     return this.productRepository.find();
   }
 
-  async create(productDto: CreateProductDto): Promise<Product> {
+  async create(productDto: CreateProductDto, userId: string): Promise<Product> {
     const { productName } = productDto;
     const isExist = await this.productRepository.findOne({
       where: { productName },
@@ -26,8 +28,9 @@ export class ProductService {
       );
     }
 
-    // const product = this.productRepository.create(productDto);
-    // return this.productRepository.save(product);
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
 
     const product = new Product();
     product.productName = productDto.productName;
@@ -35,7 +38,7 @@ export class ProductService {
     product.categoryName = productDto.categoryName;
     product.price = productDto.price;
     product.status = productDto.status;
-    product.user = productDto.user;
+    product.user = user;
 
     return this.productRepository.save(product);
   }

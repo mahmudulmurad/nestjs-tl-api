@@ -10,9 +10,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { Product, User } from '../entities';
+import { Product } from '../entities';
 import { CreateProductDto } from '../dto/create-product.dot';
-import { GetUser } from '../auth/get-user.decorator';
 import { AuthGuard } from '../auth';
 
 @Controller('products')
@@ -30,9 +29,8 @@ export class ProductController {
     @Body() product: CreateProductDto,
     @Req() req,
   ): Promise<Product> {
-    const user = req.user;
-    product.user = user;
-    return this.productService.create(product);
+    const userId = req.user.id;
+    return this.productService.create(product, userId);
   }
 
   //   @Patch('update/:id')
