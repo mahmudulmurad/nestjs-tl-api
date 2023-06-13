@@ -1,10 +1,8 @@
 import {
   Entity,
   Column,
-  Unique,
   PrimaryColumn,
 } from 'typeorm';
-@Unique(['productName'])
 @Entity()
 export class Product {
   @Column({

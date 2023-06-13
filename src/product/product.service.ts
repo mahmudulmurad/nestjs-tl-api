@@ -32,23 +32,16 @@ export class ProductService {
   }
 
   async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
-    const { productName } = updateProductDto;
-    const product = await this.productRepository
-          .createQueryBuilder()
-          .where('id = :id', { id })
-          .orWhere('product_name = :productName', { productName })
-          .getOne();
-
-    if (product) {
-      if (product.productName === productName) {
-        throw new ConflictException(
-          'product already taken. Please choose a different product name.',
-        );
-      } else {
-        Object.assign(product, updateProductDto);
-        return this.productRepository.save(product);
-      }
+    const product = await this.productRepository.findOne({
+      where: { id },
+    });
+    if (!product) {
+      throw new ConflictException(
+        'product not found!',
+      );
     }
+    const updatedProduct = Object.assign(product, updateProductDto);
+    return this.productRepository.save(updatedProduct);
   }
 
   async remove(id: string): Promise<string> {
