@@ -36,7 +36,7 @@ export class ProductService {
       where: { id },
     });
     if (!product) {
-      throw new ConflictException(
+      throw new NotFoundException(
         'product not found!!',
       );
     }
