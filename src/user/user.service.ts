@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../entities';
 import { SignUpDto } from '../dto/singup.dto';
@@ -29,8 +33,11 @@ export class UserService {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = this.userRepository.create({username, password: hashedPassword});
-    newUser.id = uuidv4(); 
+    const newUser = this.userRepository.create({
+      username,
+      password: hashedPassword,
+    });
+    newUser.id = uuidv4();
     return await this.userRepository.save(newUser);
   }
 
@@ -40,13 +47,13 @@ export class UserService {
     const user = await this.userRepository.findOne({ where: { username } });
 
     if (!user) {
-      throw new Error('Invalid username or password');
+      throw new NotFoundException('Invalid username');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new Error('Invalid username or password');
+      throw new NotFoundException('Invalid password');
     }
 
     const payload = { username: user.username, id: user.id };

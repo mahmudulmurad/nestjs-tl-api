@@ -6,6 +6,7 @@ import 'reflect-metadata';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   const logger = new Logger('Serve Said');
   await app.listen(process.env.PORT);
   logger.log(`Server is running in port:${process.env.PORT}`);
