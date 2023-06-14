@@ -3,5 +3,6 @@
 3. install mysql in your machine
     --- create user,databse as per .env-example file
 4. install nestjs glogally- npm i -g @nestjs/cli
-5. checkout to project directory and open terminal then enter-  npm install
-6. run in project directory's terminal-  npm run start:dev
+5. create .env file in project root directory and follow as .env-example file
+6. checkout to project directory and open terminal then enter-  npm install
+7. run in project directory's terminal-  npm run start:dev
