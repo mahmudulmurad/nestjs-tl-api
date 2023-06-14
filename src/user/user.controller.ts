@@ -14,10 +14,15 @@ export class UserController {
   @Post('/signup')
   async signUp(@Body() signUpDto: SignUpDto) {
     const user = await this.userService.signUp(signUpDto);
-    const accessToken = await this.jwtService.signAsync({
-      id: user.id,
-      username: user.username,
-    });
+    const accessToken = await this.jwtService.signAsync(
+      {
+        id: user.id,
+        username: user.username,
+      },
+      {
+        expiresIn: '1d',
+      },
+    );
 
     return { user, accessToken };
   }

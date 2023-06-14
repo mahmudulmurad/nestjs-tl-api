@@ -55,9 +55,12 @@ export class UserService {
     if (!isPasswordValid) {
       throw new NotFoundException('Invalid password');
     }
-
-    const payload = { username: user.username, id: user.id };
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = await this.jwtService.signAsync(
+      { username: user.username, id: user.id },
+      {
+        expiresIn: '1d',
+      },
+    );
 
     return { accessToken };
   }
