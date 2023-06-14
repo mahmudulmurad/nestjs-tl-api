@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  VersionColumn,
-  Unique,
-  PrimaryColumn,
-} from 'typeorm';
+import { Entity, Column, VersionColumn, Unique, PrimaryColumn } from 'typeorm';
 
 @Unique(['username'])
 @Entity()

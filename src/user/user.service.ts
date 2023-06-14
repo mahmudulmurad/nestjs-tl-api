@@ -43,18 +43,16 @@ export class UserService {
 
   async login(loginDto: LoginDto): Promise<{ accessToken: string }> {
     const { username, password } = loginDto;
-
     const user = await this.userRepository.findOne({ where: { username } });
-
     if (!user) {
       throw new NotFoundException('Invalid username');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!isPasswordValid) {
       throw new NotFoundException('Invalid password');
     }
+
     const accessToken = await this.jwtService.signAsync(
       { username: user.username, id: user.id },
       {

@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../entities';
@@ -13,7 +17,11 @@ export class ProductService {
   ) {}
 
   async findAll(): Promise<Product[]> {
-    return this.productRepository.find();
+    const products = await this.productRepository.find();
+    if (products.length === 0) {
+      throw new NotFoundException('no products found');
+    }
+    return products;
   }
 
   async create(productDto: CreateProductDto): Promise<Product> {
@@ -27,18 +35,19 @@ export class ProductService {
       );
     }
     const product = this.productRepository.create(productDto);
-    product.id = uuidv4(); 
+    product.id = uuidv4();
     return await this.productRepository.save(product);
   }
 
-  async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
+  async updateProduct(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { id },
     });
     if (!product) {
-      throw new NotFoundException(
-        'product not found!!',
-      );
+      throw new NotFoundException('product not found!!');
     }
     const updatedProduct = Object.assign(product, updateProductDto);
     return this.productRepository.save(updatedProduct);
@@ -49,21 +58,19 @@ export class ProductService {
       where: { id },
     });
     if (!isExist) {
-      throw new ConflictException(
-        'product does not exist.',
-      );
+      throw new ConflictException('product does not exist.');
     }
     await this.productRepository.delete(id);
-    return 'Product has been deleted'
+    return 'Product has been deleted';
   }
 
   async deleteProducts(ids: string[]): Promise<string> {
     const result = await this.productRepository
-    .createQueryBuilder()
-    .delete()
-    .from(Product)
-    .where("id IN (:...ids)", { ids })
-    .execute();
+      .createQueryBuilder()
+      .delete()
+      .from(Product)
+      .where('id IN (:...ids)', { ids })
+      .execute();
 
     if (result.affected > 0) {
       if (result.affected === ids.length) {
@@ -74,6 +81,5 @@ export class ProductService {
     } else {
       throw new NotFoundException('No products found with the provided IDs');
     }
-  
   }
 }
