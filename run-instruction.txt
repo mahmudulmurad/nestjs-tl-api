@@ -1,6 +1,6 @@
 1. install nodejs(v16 or v18) in your machine
 2. install npm in your machine
-3. install mysql (v12) in your machine
+3. install mysql in your machine
     --- create user,databse as per .env-example file
 4. install nestjs glogally- npm i -g @nestjs/cli
 5. checkout to project directory and open terminal then enter-  npm install
