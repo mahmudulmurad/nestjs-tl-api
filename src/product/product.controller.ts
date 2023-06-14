@@ -20,23 +20,23 @@ import { UpdateProductDto } from 'src/dto/update-product.dto';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
- 
   @Get('all-product')
   async getAllProducts(): Promise<Product[]> {
     return this.productService.findAll();
   }
 
   @Post('create-product')
-  async createProduct(
-    @Body() product: CreateProductDto
-  ): Promise<Product> {
+  async createProduct(@Body() product: CreateProductDto): Promise<Product> {
     return this.productService.create(product);
   }
 
-    @Patch('update/:id')
-    async updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto): Promise<Product> {
-      return this.productService.updateProduct(id, updateProductDto);
-    }
+  @Patch('update/:id')
+  async updateProduct(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    return this.productService.updateProduct(id, updateProductDto);
+  }
 
   @Delete('delete/:id')
   async deleteProduct(@Param('id') id: string): Promise<string> {
@@ -44,8 +44,8 @@ export class ProductController {
   }
 
   @Delete('batch-delete')
-  async batchDeleteProducts(@Body() data: {ids: string[]}): Promise<string> {
-    const arrayOfId =  data?.ids
+  async batchDeleteProducts(@Body() data: { ids: string[] }): Promise<string> {
+    const arrayOfId = data?.ids;
     return await this.productService.deleteProducts(arrayOfId);
   }
 }
