@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Product } from '../entities';
+import { Product, User } from '../entities';
 import { CreateProductDto } from '../dto/create-product.dot';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateProductDto } from 'src/dto/update-product.dto';
@@ -14,6 +14,9 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async findAll(): Promise<Product[]> {
@@ -24,7 +27,18 @@ export class ProductService {
     return products;
   }
 
-  async create(productDto: CreateProductDto): Promise<Product> {
+  async findAllProductsOfUser(userId: string): Promise<Product[]> {
+    const products = await this.productRepository.find({ 
+      where: { user: { id: userId } },
+       relations: ['user']
+       });
+    if (products.length === 0) {
+      throw new NotFoundException('no products found');
+    }
+    return products;
+  }
+
+  async create(productDto: CreateProductDto,userId : string): Promise<Product> {
     const { productName } = productDto;
     const isExist = await this.productRepository.findOne({
       where: { productName },
@@ -34,7 +48,11 @@ export class ProductService {
         'product already taken. Please choose a different product name.',
       );
     }
-    const product = this.productRepository.create(productDto);
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    const product = this.productRepository.create({...productDto, user});
     product.id = uuidv4();
     return await this.productRepository.save(product);
   }

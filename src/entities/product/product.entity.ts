@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne } from 'typeorm';
+import { User } from '../user/user.entity';
 @Entity()
 export class Product {
   @Column({
@@ -57,4 +58,7 @@ export class Product {
     nullable: true,
   })
   updatedAt: Date | null;
+
+  @ManyToOne(() => User, user => user.products)
+  user: User;
 }
