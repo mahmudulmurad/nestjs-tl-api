@@ -15,6 +15,7 @@ services:
     networks:
       - mynetwork
     volumes:
+      - '.:/app'
       - '/app/node_modules'
       
     depends_on:
@@ -22,7 +23,7 @@ services:
 
   # MySQL Database
   db:
-    image: mysql:latest  # You can choose a different MySQL version if needed
+    image: mysql:8.0  # You can choose a different MySQL version if needed
     environment:
       MYSQL_ROOT_PASSWORD: New@Password@123
       MYSQL_DATABASE: tldatabase
