@@ -1,0 +1,35 @@
+version: '3.8'
+
+networks:
+  mynetwork:
+    driver: bridge
+
+services:
+  # NestJS Application
+  backend-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3100:3100" # Map the app's port to the host machine
+    networks:
+      - mynetwork
+    volumes:
+      - '/app/node_modules'
+      
+    depends_on:
+      - db  # Ensure the database container is started before the app
+
+  # MySQL Database
+  db:
+    image: mysql:latest  # You can choose a different MySQL version if needed
+    environment:
+      MYSQL_ROOT_PASSWORD: New@Password@123
+      MYSQL_DATABASE: tldatabase
+    ports:
+      - "3307:3306"  # Map the MySQL port to the host machine
+    volumes:
+      - ./mysql_data:/var/lib/mysql  # Mount a volume for persistent data storage
+    networks:
+      - mynetwork 
+
