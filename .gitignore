@@ -1,5 +1,6 @@
 # compiled output
 mysql_data
+/mysql_data
 /dist
 /node_modules
 /.env
@@ -35,7 +36,3 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-
-//custome-data
-/mysql_data
