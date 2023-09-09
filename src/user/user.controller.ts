@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {Controller, Post, Body, Get} from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignUpDto } from '../dto/singup.dto';
 import { LoginDto } from '../dto/login.dto';
@@ -11,6 +11,11 @@ export class UserController {
     private readonly jwtService: JwtService,
   ) {}
 
+  @Get('/murad')
+  getHello(){
+    return this.userService.hello();
+  }
+
   @Post('/signup')
   async signUp(@Body() signUpDto: SignUpDto) {
     const user = await this.userService.signUp(signUpDto);
@@ -22,13 +27,17 @@ export class UserController {
       {
         expiresIn: '1d',
       },
-    );
-
+    )
     return { user, accessToken };
   }
 
   @Post('/login')
   async login(@Body() loginDto: LoginDto) {
-    return this.userService.login(loginDto);
+    try {
+      return this.userService.login(loginDto);
+    } catch (error) {
+      console.error('Error sending message to loggerService:', error);
+    }
+
   }
 }

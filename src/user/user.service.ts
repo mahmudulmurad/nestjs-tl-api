@@ -1,5 +1,5 @@
 import {
-  ConflictException,
+  ConflictException, Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import {ClientProxy} from "@nestjs/microservices";
 
 @Injectable()
 export class UserService {
@@ -18,19 +19,21 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    @Inject('LOGGER_SERVICE') private loggerService: ClientProxy,
   ) {}
+
+  hello(){
+    return this.loggerService.send({cmd: 'user'}, `murad`);
+  }
 
   async signUp(signUpDto: SignUpDto): Promise<User> {
     const { username, password } = signUpDto;
-
     const isExist = await this.userRepository.findOne({ where: { username } });
-
     if (isExist) {
       throw new ConflictException(
         'Username is already taken. Please choose a different username.',
       );
     }
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = this.userRepository.create({
@@ -59,7 +62,7 @@ export class UserService {
         expiresIn: '1d',
       },
     );
-
+    this.hello()
     return { accessToken };
   }
 }
