@@ -38,6 +38,10 @@ export class UserController {
     } catch (error) {
       console.error('Error sending message to loggerService:', error);
     }
+  }
 
+  @Get('/upload-user-data')
+  uploadUserData(){
+    return this.userService.userDataImport();
   }
 }

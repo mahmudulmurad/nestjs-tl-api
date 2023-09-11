@@ -12,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import {ClientProxy} from "@nestjs/microservices";
+const ExcelJS = require('exceljs');
 
 @Injectable()
 export class UserService {
@@ -24,6 +25,41 @@ export class UserService {
 
   hello(){
     return this.loggerService.send({cmd: 'user'}, `murad`);
+  }
+
+  async userDataImport(): Promise<User[]>{
+    const workbook = new ExcelJS.Workbook();
+    const excelFile = 'data/MOCK_DATA.xlsx'
+      workbook.xlsx.readFile(excelFile)
+          .then(() => {
+            const worksheet = workbook.getWorksheet(1);
+            worksheet.eachRow({ includeEmpty: false }, async (row, rowNumber) => {
+              if (rowNumber > 1) {
+                const data = row.values
+                const rowId = data['1']
+                const rowUserName = data['2']
+                const queryBuilder = this.userRepository.createQueryBuilder('user');
+                const user = await queryBuilder
+                    .where('user.username = :username', { rowUserName })
+                    .orWhere('user.id = :id', { rowId })
+                    .getOne();
+                if (!user) {
+                  const salt = await bcrypt.genSalt(10);
+                  const hashedPassword = await bcrypt.hash(data['3'], salt);
+                  const newUser = this.userRepository.create({
+                    id: data['1'],
+                    username: data['2'],
+                    password: hashedPassword,
+                  })
+                  await this.userRepository.save(newUser);
+                }
+              }
+            })
+          })
+          .catch((error) => {
+            console.error('Error reading Excel file:', error);
+          })
+    return await this.userRepository.find()
   }
 
   async signUp(signUpDto: SignUpDto): Promise<User> {
