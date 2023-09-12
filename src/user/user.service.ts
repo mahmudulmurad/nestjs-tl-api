@@ -1,5 +1,6 @@
 import {
-  ConflictException, Inject,
+  ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,7 +12,8 @@ import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import {ClientProxy} from "@nestjs/microservices";
+import { ClientProxy } from '@nestjs/microservices';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ExcelJS = require('exceljs');
 
 @Injectable()
@@ -23,43 +25,56 @@ export class UserService {
     @Inject('LOGGER_SERVICE') private loggerService: ClientProxy,
   ) {}
 
-  hello(){
-    return this.loggerService.send({cmd: 'user'}, `murad`);
+  hello() {
+    return this.loggerService.send({ cmd: 'user' }, `murad`);
   }
 
-  async userDataImport(): Promise<User[]>{
-    const workbook = new ExcelJS.Workbook();
-    const excelFile = 'data/MOCK_DATA.xlsx'
-      workbook.xlsx.readFile(excelFile)
-          .then(() => {
-            const worksheet = workbook.getWorksheet(1);
-            worksheet.eachRow({ includeEmpty: false }, async (row, rowNumber) => {
-              if (rowNumber > 1) {
-                const data = row.values
-                const rowId = data['1']
-                const rowUserName = data['2']
-                const queryBuilder = this.userRepository.createQueryBuilder('user');
-                const user = await queryBuilder
-                    .where('user.username = :username', { rowUserName })
-                    .orWhere('user.id = :id', { rowId })
-                    .getOne();
-                if (!user) {
-                  const salt = await bcrypt.genSalt(10);
-                  const hashedPassword = await bcrypt.hash(data['3'], salt);
-                  const newUser = this.userRepository.create({
-                    id: data['1'],
-                    username: data['2'],
-                    password: hashedPassword,
-                  })
-                  await this.userRepository.save(newUser);
-                }
+  async userDataImport(): Promise<User[]> {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const excelFile = 'data/MOCK_DATA.xlsx';
+      await workbook.xlsx.readFile(excelFile);
+
+      const worksheet = workbook.getWorksheet(1);
+      const promises: Promise<User>[] = [];
+
+      worksheet.eachRow(
+        { includeEmpty: false },
+        async (row: any[], rowNumber: number) => {
+          if (rowNumber > 1) {
+            const data = row.values;
+            const rowUserName = data['1'];
+            try {
+              const isExist = await this.userRepository.findOne({
+                where: { username: rowUserName },
+              });
+              if (!isExist) {
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(data['2'], salt);
+                const newUser = this.userRepository.create({
+                  username: data['2'],
+                  password: hashedPassword,
+                });
+                newUser.id = uuidv4();
+                promises.push(this.userRepository.save(newUser));
               }
-            })
-          })
-          .catch((error) => {
-            console.error('Error reading Excel file:', error);
-          })
-    return await this.userRepository.find()
+            } catch (error) {
+              console.error('Error:', error);
+            }
+          }
+        },
+      );
+
+      await Promise.all(promises).then((res) => {
+        console.log(res);
+      });
+
+      const allUsers = await this.userRepository.find();
+      return allUsers;
+    } catch (error) {
+      console.error('Error reading or importing data:', error);
+      throw error;
+    }
   }
 
   async signUp(signUpDto: SignUpDto): Promise<User> {
@@ -98,7 +113,7 @@ export class UserService {
         expiresIn: '1d',
       },
     );
-    this.hello()
+    this.hello();
     return { accessToken };
   }
 }

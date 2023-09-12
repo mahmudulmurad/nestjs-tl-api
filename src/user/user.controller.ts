@@ -1,4 +1,4 @@
-import {Controller, Post, Body, Get} from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignUpDto } from '../dto/singup.dto';
 import { LoginDto } from '../dto/login.dto';
@@ -12,7 +12,7 @@ export class UserController {
   ) {}
 
   @Get('/murad')
-  getHello(){
+  getHello() {
     return this.userService.hello();
   }
 
@@ -27,7 +27,7 @@ export class UserController {
       {
         expiresIn: '1d',
       },
-    )
+    );
     return { user, accessToken };
   }
 
@@ -41,7 +41,7 @@ export class UserController {
   }
 
   @Get('/upload-user-data')
-  uploadUserData(){
+  uploadUserData() {
     return this.userService.userDataImport();
   }
 }
