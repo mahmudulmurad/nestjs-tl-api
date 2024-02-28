@@ -28,17 +28,17 @@ export class ProductService {
   }
 
   async findAllProductsOfUser(userId: string): Promise<Product[]> {
-    const products = await this.productRepository.find({ 
+    const products = await this.productRepository.find({
       where: { user: { id: userId } },
-       relations: ['user']
-       });
+      relations: ['user'],
+    });
     if (products.length === 0) {
       throw new NotFoundException('no products found');
     }
     return products;
   }
 
-  async create(productDto: CreateProductDto,userId : string): Promise<Product> {
+  async create(productDto: CreateProductDto, userId: string): Promise<Product> {
     const { productName } = productDto;
     const isExist = await this.productRepository.findOne({
       where: { productName },
@@ -52,7 +52,7 @@ export class ProductService {
       where: { id: userId },
     });
 
-    const product = this.productRepository.create({...productDto, user});
+    const product = this.productRepository.create({ ...productDto, user });
     product.id = uuidv4();
     return await this.productRepository.save(product);
   }

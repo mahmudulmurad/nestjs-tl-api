@@ -16,6 +16,6 @@ import { ResponseService } from 'src/service/response.service';
     }),
   ],
   controllers: [ProductController],
-  providers: [ProductService,ResponseService],
+  providers: [ProductService, ResponseService],
 })
 export class ProductModule {}

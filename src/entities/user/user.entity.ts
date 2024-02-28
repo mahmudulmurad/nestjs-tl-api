@@ -1,4 +1,11 @@
-import { Entity, Column, VersionColumn, Unique, PrimaryColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  VersionColumn,
+  Unique,
+  PrimaryColumn,
+  OneToMany,
+} from 'typeorm';
 import { Product } from '../product/product.entity';
 
 @Unique(['username'])
@@ -42,6 +49,6 @@ export class User {
   })
   updatedAt: Date | null;
 
-  @OneToMany(() => Product, product => product.user)
+  @OneToMany(() => Product, (product) => product.user)
   products: Product[];
 }

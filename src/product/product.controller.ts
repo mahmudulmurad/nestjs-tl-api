@@ -26,28 +26,37 @@ export class ProductController {
   constructor(
     private readonly productService: ProductService,
     private readonly responseService: ResponseService,
-    ) {}
+  ) {}
 
   @Get('all-product')
   async getAllProducts(): Promise<ResponseDto> {
     const productsDto = await this.productService.findAll();
-    return this.responseService.toDtosResponse(HttpStatus.OK, 'List of all products', productsDto);
+    return this.responseService.toDtosResponse(
+      HttpStatus.OK,
+      'List of all products',
+      productsDto,
+    );
   }
 
   @Get('current-user/all-product')
-  async getAllProductsOfUser(@Req() request: CustomRequest): Promise<Product[]> {
-    const userId = request.user?.id
+  async getAllProductsOfUser(
+    @Req() request: CustomRequest,
+  ): Promise<Product[]> {
+    const userId = request.user?.id;
     return this.productService.findAllProductsOfUser(userId);
   }
 
   @Post('create-product')
-  async createProduct(@Req() request: CustomRequest, @Body() product: CreateProductDto): Promise<ResponseDto> {
-    const userId = request.user?.id
+  async createProduct(
+    @Req() request: CustomRequest,
+    @Body() product: CreateProductDto,
+  ): Promise<ResponseDto> {
+    const userId = request.user?.id;
     const newProduct = this.productService.create(product, userId);
     return this.responseService.toDtoResponse(
       HttpStatus.CREATED,
       'Product Creation successful',
-      newProduct
+      newProduct,
     );
   }
 

@@ -59,6 +59,6 @@ export class Product {
   })
   updatedAt: Date | null;
 
-  @ManyToOne(() => User, user => user.products)
+  @ManyToOne(() => User, (user) => user.products)
   user: User;
 }
