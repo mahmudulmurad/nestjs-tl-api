@@ -2,7 +2,9 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../entities';
@@ -13,8 +15,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { ClientProxy } from '@nestjs/microservices';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const ExcelJS = require('exceljs');
 
 @Injectable()
 export class UserService {
@@ -27,54 +27,6 @@ export class UserService {
 
   hello() {
     return this.loggerService.send({ cmd: 'user' }, `murad`);
-  }
-
-  async userDataImport(): Promise<User[]> {
-    try {
-      const workbook = new ExcelJS.Workbook();
-      const excelFile = 'data/MOCK_DATA.xlsx';
-      await workbook.xlsx.readFile(excelFile);
-
-      const worksheet = workbook.getWorksheet(1);
-      const promises: Promise<User>[] = [];
-
-      worksheet.eachRow(
-        { includeEmpty: false },
-        async (row: any[], rowNumber: number) => {
-          if (rowNumber > 1) {
-            const data = row.values;
-            const rowUserName = data['1'];
-            try {
-              const isExist = await this.userRepository.findOne({
-                where: { username: rowUserName },
-              });
-              if (!isExist) {
-                const salt = await bcrypt.genSalt(10);
-                const hashedPassword = await bcrypt.hash(data['2'], salt);
-                const newUser = this.userRepository.create({
-                  username: data['2'],
-                  password: hashedPassword,
-                });
-                newUser.id = uuidv4();
-                promises.push(this.userRepository.save(newUser));
-              }
-            } catch (error) {
-              console.error('Error:', error);
-            }
-          }
-        },
-      );
-
-      await Promise.all(promises).then((res) => {
-        console.log(res);
-      });
-
-      const allUsers = await this.userRepository.find();
-      return allUsers;
-    } catch (error) {
-      console.error('Error reading or importing data:', error);
-      throw error;
-    }
   }
 
   async signUp(signUpDto: SignUpDto): Promise<User> {
@@ -97,23 +49,27 @@ export class UserService {
 
   async login(loginDto: LoginDto): Promise<{ accessToken: string }> {
     const { username, password } = loginDto;
-    const user = await this.userRepository.findOne({ where: { username } });
-    if (!user) {
-      throw new NotFoundException('Invalid username');
-    }
+    try {
+      const user = await this.userRepository.findOne({ where: { username } });
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new NotFoundException('Invalid password');
-    }
+      if (!user) {
+        throw new NotFoundException('Invalid username');
+      }
 
-    const accessToken = await this.jwtService.signAsync(
-      { username: user.username, id: user.id },
-      {
-        expiresIn: '1d',
-      },
-    );
-    this.hello();
-    return { accessToken };
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid password');
+      }
+
+      const accessToken = await this.jwtService.signAsync(
+        { username: user.username, id: user.id },
+        {
+          expiresIn: '1d',
+        },
+      );
+      return { accessToken };
+    } catch (error) {
+      throw new InternalServerErrorException('Error during login');
+    }
   }
 }
