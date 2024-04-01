@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { dbConnection } from './database/connection';
-import { UserModule } from './user/user.module';
-import { ProductModule } from './product/product.module';
-import { ReviewModule } from './review/review.module';
+import { UserModule } from './territories/user/user.module';
+import { ProductModule } from './territories/product/product.module';
+import { ReviewModule } from './territories/review/review.module';
 
 @Module({
   imports: [dbConnection(), UserModule, ProductModule, ReviewModule],

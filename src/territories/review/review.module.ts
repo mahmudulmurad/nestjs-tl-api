@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { ProductReview } from '../entities';
+import { ProductReview } from '../../entities';
 import { ReviewService } from './review.service';
-import { jwtConstants } from '../auth/secret';
+import { jwtConstants } from '../../auth/secret';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ReviewController } from './review.controller';
 import { ResponseService } from 'src/service/response.service';

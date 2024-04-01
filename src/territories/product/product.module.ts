@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { Product, User } from '../entities';
+import { Product, User } from '../../entities';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from '../auth/secret';
+import { jwtConstants } from '../../auth/secret';
 import { ResponseService } from 'src/service/response.service';
 
 @Module({

@@ -7,9 +7,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../entities';
-import { SignUpDto } from '../dto/singup.dto';
-import { LoginDto } from '../dto/login.dto';
+import { User } from '../../entities';
+import { SignUpDto } from '../../dto/singup.dto';
+import { LoginDto } from '../../dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -24,10 +24,6 @@ export class UserService {
     private readonly jwtService: JwtService,
     @Inject('LOGGER_SERVICE') private loggerService: ClientProxy,
   ) {}
-
-  hello() {
-    return this.loggerService.send({ cmd: 'user' }, `murad`);
-  }
 
   async signUp(signUpDto: SignUpDto): Promise<User> {
     const { username, password } = signUpDto;
