@@ -11,7 +11,10 @@ import { ReviewService } from './review.service';
 import { ReviewDto } from 'src/dto/review.dto';
 import { AuthGuard } from 'src/auth';
 import { ResponseService } from 'src/service/response.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('PRODUCT-REVIEW')
+@ApiBearerAuth()
 @UseGuards(AuthGuard)
 @Controller('review')
 export class ReviewController {

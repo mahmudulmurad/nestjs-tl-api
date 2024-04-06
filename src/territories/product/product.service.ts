@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Product, User } from '../entities';
-import { CreateProductDto } from '../dto/create-product.dot';
+import { Product, User } from '../../entities';
+import { CreateProductDto } from '../../dto/create-product.dot';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateProductDto } from 'src/dto/update-product.dto';
 @Injectable()

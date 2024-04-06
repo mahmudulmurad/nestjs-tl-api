@@ -12,14 +12,17 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { Product } from '../entities';
-import { CreateProductDto } from '../dto/create-product.dot';
-import { AuthGuard } from '../auth';
-import { UpdateProductDto } from '../dto/update-product.dto';
-import { CustomRequest } from '../interface/customRequest.interface';
+import { Product } from '../../entities';
+import { CreateProductDto } from '../../dto/create-product.dot';
+import { AuthGuard } from '../../auth';
+import { UpdateProductDto } from '../../dto/update-product.dto';
+import { CustomRequest } from '../../interface/customRequest.interface';
 import { ResponseService } from 'src/service/response.service';
 import { ResponseDto } from 'src/dto/response/response.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('PRODUCT')
+@ApiBearerAuth()
 @UseGuards(AuthGuard)
 @Controller('products')
 export class ProductController {

@@ -1,20 +1,17 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { UserService } from './user.service';
-import { SignUpDto } from '../dto/singup.dto';
-import { LoginDto } from '../dto/login.dto';
+import { SignUpDto } from '../../dto/singup.dto';
+import { LoginDto } from '../../dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('USER')
 @Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
-
-  @Get('/murad')
-  getHello() {
-    return this.userService.hello();
-  }
 
   @Post('/signup')
   async signUp(@Body() signUpDto: SignUpDto) {
@@ -38,10 +35,5 @@ export class UserController {
     } catch (error) {
       console.error('Error sending message to loggerService:', error);
     }
-  }
-
-  @Get('/upload-user-data')
-  uploadUserData() {
-    return this.userService.userDataImport();
   }
 }
