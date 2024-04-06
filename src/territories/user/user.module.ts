@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { User } from '../../entities';
+import { Notification, User } from '../../entities';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { jwtConstants } from '../../auth/secret';
@@ -19,7 +19,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         },
       },
     ]),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Notification]),
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1h' },

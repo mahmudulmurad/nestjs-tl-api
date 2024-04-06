@@ -1,6 +1,5 @@
 import {
   ConflictException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -14,7 +13,6 @@ import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class UserService {
@@ -22,7 +20,6 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-    @Inject('LOGGER_SERVICE') private loggerService: ClientProxy,
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<User> {

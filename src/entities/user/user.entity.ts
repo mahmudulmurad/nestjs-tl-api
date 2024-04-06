@@ -5,8 +5,11 @@ import {
   Unique,
   PrimaryColumn,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Product } from '../product/product.entity';
+import { Notification } from '../notification/notification.entity';
 
 @Unique(['username'])
 @Entity()
@@ -51,4 +54,7 @@ export class User {
 
   @OneToMany(() => Product, (product) => product.user)
   products: Product[];
+
+  @OneToOne(() => Notification)
+  notification: Notification;
 }
