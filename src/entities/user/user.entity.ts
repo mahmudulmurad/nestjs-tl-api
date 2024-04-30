@@ -6,7 +6,6 @@ import {
   PrimaryColumn,
   OneToMany,
   OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { Product } from '../product/product.entity';
 import { Notification } from '../notification/notification.entity';
@@ -55,6 +54,6 @@ export class User {
   @OneToMany(() => Product, (product) => product.user)
   products: Product[];
 
-  @OneToOne(() => Notification)
+  @OneToOne(() => Notification, (notification) => notification.user)
   notification: Notification;
 }

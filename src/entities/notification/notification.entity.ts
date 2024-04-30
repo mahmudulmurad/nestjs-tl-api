@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 
 @Entity()
@@ -16,5 +16,6 @@ export class Notification {
   expoAppToken: string;
 
   @OneToOne(() => User, (user) => user.notification)
+  @JoinColumn()
   user: User;
 }

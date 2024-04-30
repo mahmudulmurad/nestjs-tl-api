@@ -5,11 +5,15 @@ import {
   Param,
   UseGuards,
   HttpStatus,
+  Req,
+  Get,
 } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { AuthGuard } from 'src/auth';
 import { ResponseService } from 'src/service/response.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CustomRequest } from 'src/interface/customRequest.interface';
+import { ExpoNotificationDto } from 'src/dto/expo-notofication.dto';
 
 @ApiTags('Expo-Notification')
 @ApiBearerAuth()
@@ -21,17 +25,35 @@ export class NotificationController {
     private readonly responseService: ResponseService,
   ) {}
 
-  @Post('/create-review/:userId')
-  async signUp(@Param('userId') userId: string, @Body() expoAppToken: string) {
-    const review = await this.notificationService.createExpoNotification(
+  @Post('/create-expo-notofication')
+  async signUp(
+    @Req() request: CustomRequest,
+    @Body() notificationDto: ExpoNotificationDto,
+  ) {
+    const userId = request.user?.id;
+    const notification = await this.notificationService.createExpoNotification(
+      notificationDto,
       userId,
-      expoAppToken,
     );
 
     return this.responseService.toDtoResponse(
       HttpStatus.CREATED,
-      'Review Creation successful',
-      review,
+      'Expo Notification Creation successful',
+      notification,
+    );
+  }
+
+  @Get('/get-expo-notofication')
+  async notifications(@Req() request: CustomRequest) {
+    const userId = request.user?.id;
+    const notifications = await this.notificationService.getExpoNotification(
+      userId,
+    );
+
+    return this.responseService.toDtosResponse(
+      HttpStatus.OK,
+      'List of Expo Notification',
+      notifications,
     );
   }
 }
