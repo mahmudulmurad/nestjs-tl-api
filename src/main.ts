@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
 import 'dotenv/config';
 import 'reflect-metadata';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -31,9 +31,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+
   await app.listen(process.env.PORT);
-  const logger = new Logger('NEST SERVER');
-  logger.log(`Server is running in port:${process.env.PORT} 🔥🚀🚀🚀🔥`);
+  const logger = new Logger('🔥');
+  logger.log(`V8 is running in port:${process.env.PORT} 🔥🚀🚀🚀🔥`);
 }
 
 bootstrap();

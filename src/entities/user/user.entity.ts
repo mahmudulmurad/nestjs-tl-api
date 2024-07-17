@@ -7,6 +7,7 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { Product } from '../product/product.entity';
 import { Notification } from '../notification/notification.entity';
 
@@ -30,6 +31,7 @@ export class User {
     name: 'password',
     nullable: false,
   })
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @VersionColumn()

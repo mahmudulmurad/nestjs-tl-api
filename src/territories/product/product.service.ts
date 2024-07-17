@@ -32,6 +32,7 @@ export class ProductService {
       where: { user: { id: userId } },
       relations: ['user'],
     });
+
     if (products.length === 0) {
       throw new NotFoundException('no products found');
     }

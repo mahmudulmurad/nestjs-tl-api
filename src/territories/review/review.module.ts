@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { ProductReview } from '../../entities';
+import { Product, ProductReview, User } from '../../entities';
 import { ReviewService } from './review.service';
 import { jwtConstants } from '../../auth/secret';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -20,7 +20,7 @@ import { ResponseService } from 'src/service/response.service';
         },
       },
     ]),
-    TypeOrmModule.forFeature([ProductReview]),
+    TypeOrmModule.forFeature([ProductReview, Product, User]),
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1h' },
